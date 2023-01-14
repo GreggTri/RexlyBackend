@@ -1,0 +1,118 @@
+{
+    "intents": [
+        {
+            "tag": "search",
+            "patterns": [
+                "I'm looking for a ",
+                "do you have any ",
+                "I'm in need of a",
+                "I want a ",
+                "i only have dollars",
+                "i only have a budget of 50 dollars got any tv's around that",
+                "I need a white monitor for around 200",
+                "i need black aviators",
+                "I'm looking for a pair of sneakers for 50 dollars that are red",
+                "I need spoons that are green",
+                "do you have any comforters that are blue?",
+                "can I get a yellow blanket for like 50 bucks",
+                "brown 6 foot teddy bear",
+                "i need orange house items",
+                "I want a purple dress for a wedding",
+                "any pink iphone cases",
+                "i need a gray pair of jeans around 50",
+                "glass cups",
+                "paper towels",
+                "old spice deodorant",
+                "i need a luxury stool for 75",
+                "a microwave",
+                "what about spoons that are 50 dollars",
+                "what about some heated blankets",
+                "what kind of monitors do you have?"
+            ],
+            "responses": [
+                "Here are the top 4 products that I found!",
+                "Here's 4 of the best products I could find!",
+                "the 4 best products that match your search are",
+                "The top 4 products are: ",
+                "I found these 4 to choose from: "
+            ],
+            "action": "search_query"
+        },
+        {
+            "tag": "how does this work",
+            "patterns": [
+                "what is rexly",
+                "How does rexly work",
+                "how does this work",
+                "what do you do"
+            ],
+            "responses": [
+                "I am a robot that really likes helping people find the best products for their needs",
+                "I search for the products that you tell me to and find the best ones that I can find"
+            ],
+            "action": ""
+        },
+        {
+            "tag": "next best product",
+            "patterns": [
+                "can I more products like product 1",
+                "any more products like the second product?",
+                "can i see the next best product",
+                "any other products just like the third one?",
+                "can you find me one just like the second one",
+                "anything like the last one? but just slightly different"
+            ],
+            "responses": [
+                "here's the next best product that I found",
+                "Here's a products that is very similar to the first one you liked"
+            ],
+            "action": "nextbestproduct"
+        },
+        {
+            "tag": "feedback",
+            "patterns": [
+                "oh that is soo cool!",
+                "you suck rexly",
+                "this bot is terrible",
+                "what a shit company",
+                "why doesn't this work",
+                "this was so helpful, thank you so much",
+                "it would be a really cool idea to do this for",
+                "have you thought about this",
+                "oh this is soo cool!",
+                "this was so helpful, thank you so much",
+                "wow, this is awesome",
+                "god this bot is so bad",
+                "good job!",
+                "wow, this is actually works",
+                "these are terrible products",
+                "why would you show me these products"
+            ],
+            "responses": [
+                "Thank you for your feedback, I'll be sure to let my superiors know!"
+            ],
+            "action": ""
+        },
+        {
+            "tag": "grettings",
+            "patterns": [
+                "hello",
+                "hi",
+                "hey rexly",
+                "yo",
+                "whats up",
+                "how are you doing",
+                "hey you",
+                "sup nerd"
+            ],
+            "responses": [
+                "Hello, This is Rexly! what kind of products are you looking for?",
+                "Hello, This is Rexly! how can I help you with your product search today?",
+                "Hello, This is Rexly! what products are you looking for?",
+                "Hello, This is Rexly! anything I can do to help with your product search?",
+                "Hello, This is Rexly! what are you looking for?"
+            ],
+            "action": ""
+        }
+    ]
+}

@@ -1,0 +1,30 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/SchemaDB/node_modules
+/.pnp
+.pnp.js
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+*/npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+#python cache
+app/__pycache__
+app/controllers/__pycache__
+app/AI/__pycache__
+app/routers/__pycache__
+app/utils/__pycache__
+
+# local env files
+.env*.local
+/app/.env*.local
+/app/.env
+/SchemaDB/.env*.local
+/SchemaDB/.env
