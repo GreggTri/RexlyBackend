@@ -5,17 +5,16 @@ from controllers.chatController import chatController
 router = APIRouter()
 
 #this is a model schema for what the incoming request will look like
-class IncomingMessage(BaseModel):
-    user_msg: str
-    phoneNumber: str
+class Event(BaseModel):
+    Body: str
+    From: str
 
 #TODO:: Finish marketing Website and styling for create Account
-#TODO:: setup git repo
-#TODO:: deploy staged version of it
-#TODO:: set-up twillio SMS API for chat <- CreateAccount part is done but need public server for webhook
+#TODO:: deploy staged version of it to AWS
+#TODO:: Test Webhook stuff
 #TODO:: TEST & make bot a little betteer 
 #TODO:: SEND INTO PRODUCTION!!!!!!!!!!!!
 
 @router.post("/chat", status_code=status.HTTP_200_OK)
-async def chat(req: Request, res: Response, incomingMsg: IncomingMessage):
+async def chat(req: Request, res: Response, incomingMsg: Event):
     return await chatController(req, res, incomingMsg)

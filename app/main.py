@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
@@ -9,11 +10,6 @@ from twilio.rest import Client
 account_sid = os.getenv('TWILIO_ACCOUNT_TOKEN')
 # Your Auth Token from twilio.com/console
 auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
-
-
-
-
-
 
 load_dotenv()
 from routers import users, chat
@@ -55,3 +51,11 @@ async def root():
     print(message.sid)
     
     return {'message': message}
+
+@app.post('/{short_url}')
+def redirection(req: Request, res: Response, short_url):
+    long_url = req.app.db['urls'](short=short_url)
+    if long_url:
+        return RedirectResponse(long_url.long, status.HTTP_303_SEE_OTHER)
+    else:
+        return f'<h1>Url doesnt exist</h1>'

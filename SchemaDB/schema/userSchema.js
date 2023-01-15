@@ -5,6 +5,8 @@ const UserSchema = new mongoose.Schema({
     phoneNumber: {type: String, required: true, unique: true},
     password: {type: String, required: true, unique: true}
 
-}, {timestamps: true})
+}, {timestamps: {
+    createdAt: 'created_at'
+}})
 
-module.exports = mongoose.model('User', UserSchema)
+module.exports = mongoose.model('users', UserSchema)
