@@ -25,8 +25,8 @@ except Exception as e:
     print("Error: ", e)
     
 origins = [
-    "http://localhost:5000",
-    "http://localhost:3000"
+    os.getenv('CREATE_ACCOUNT_URL'),
+    os.getenv('RETAILER_API')
 ]
 
 app.add_middleware(
@@ -45,7 +45,7 @@ async def root():
     
     message = app.twilio.messages.create(
     to="+12034828850", 
-    from_="+18623754523",
+    from_=os.getenv('TWILIO_NUMBER'),
     body="Hello from Python!")
     
     print(message.sid)
@@ -54,7 +54,7 @@ async def root():
 
 @app.post('/{short_url}')
 def redirection(req: Request, res: Response, short_url):
-    long_url = req.app.db['urls'](short=short_url)
+    long_url = req.app.db['urls']({"short":short_url})
     if long_url:
         return RedirectResponse(long_url.long, status.HTTP_303_SEE_OTHER)
     else:
