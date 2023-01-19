@@ -61,24 +61,23 @@ async def rexlyBot(message):
                         "tag": tag,
                         "probRes": f"{prob.item():.4f}"
                     }
-                    
-                elif intent["action"] == "nextbestproduct":
-                    async with httpx.AsyncClient() as client:
-                        #obviously change to nbp endpoint when possible
-                        response = await client.post("http://localhost:5000/api/v1/test")
-                        if response.status_code == 500:
-                            return "500 Error"
-                        elif response.status_code == 400:
-                            return "400 Error"
-                        
-                        response = response.json()
-                    
-                    return {
-                        "intentResult": random.choice(intent['responses']),
-                        "nbp": response,
-                        "tag": tag,
-                        "probRes": f"{prob.item():.4f}"
-                    }
+                #elif intent["action"] == "nextbestproduct":
+                #    async with httpx.AsyncClient() as client:
+                #        #obviously change to nbp endpoint when possible
+                #        response = await client.post("http://localhost:5000/api/v1/nbp")
+                #        if response.status_code == 500:
+                #            return "500 Error"
+                #        elif response.status_code == 400:
+                #            return "400 Error"
+                #        
+                #        response = response.json()
+                #    
+                #    return {
+                #        "intentResult": random.choice(intent['responses']),
+                #        "nbp": response,
+                #        "tag": tag,
+                #        "probRes": f"{prob.item():.4f}"
+                #    }
                 else:
                     return {
                         'intentResult': random.choice(intent['responses']),

@@ -5,10 +5,8 @@ const MessageSchema = new mongoose.Schema({
     user_msg: {type: String, required: true},
     tag: {type: String, required: true},
     bot_response: {type: String, required: true},
-    probability_response: {type: String}
+    probability_response: {type: String},
+})
 
-}, {timestamps: {
-    createdAt: 'created_at'
-}})
-
+MessageSchema.set('timestamps', true)
 module.exports = mongoose.model('messages', MessageSchema)

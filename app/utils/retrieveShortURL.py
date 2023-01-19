@@ -3,15 +3,16 @@ from fastapi.encoders import jsonable_encoder
 import os
 from dotenv import load_dotenv
 
-def retrieveShortURL(req, long_url):
+def retrieveShortURL(req, user_id, long_url):
     #url_received = request.form["nm"]
-    found_url = req.app.db({"long":long_url}) #how to actually write a query here
+    found_url = req.app.db({"long":long_url, "user_id":user_id})
 
     if found_url:
         return f"{os.getenv('URL_DEV_LINK')}{found_url.short}"
     else:
         short_url = shortenedUrlLetters(req)
         newURL = {
+            "user_id": user_id,
             "long": long_url,
             "short": short_url
         }
@@ -21,4 +22,4 @@ def retrieveShortURL(req, long_url):
         if response.acknowledged == True:
             return f"{os.getenv('URL_DEV_LINK')}{short_url}"
         else:
-            return "Sorry, couldn't get the link"
+            return "Sorry, couldn't get a link"

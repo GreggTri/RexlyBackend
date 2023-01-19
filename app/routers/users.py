@@ -9,6 +9,7 @@ class user(BaseModel):
     email: str
     phoneNumber: str
     password: str
+    fromPhoneLink: bool
 
 
 #creates the users account and should also sent a text to user tellin them that they'r eaccount has been created.

@@ -1,10 +1,11 @@
 from fastapi import FastAPI, Depends, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.encoders import jsonable_encoder
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
 from twilio.rest import Client
+from amplitude import *
 
 # Your Account SID from twilio.com/console
 account_sid = os.getenv('TWILIO_ACCOUNT_TOKEN')
@@ -19,6 +20,7 @@ try:
     app.mongodb_client = MongoClient(host=os.getenv('MONGO_URL'))
     app.db = app.mongodb_client[os.getenv('DB_NAME')]
     app.twilio = Client(account_sid, auth_token)
+    app.amplitude = Amplitude(os.getenv('AMP_API_KEY'))
     print("connected to database!")
 
 except Exception as e:
@@ -26,7 +28,8 @@ except Exception as e:
     
 origins = [
     os.getenv('CREATE_ACCOUNT_URL'),
-    os.getenv('RETAILER_API')
+    os.getenv('RETAILER_API'),
+    os.getenv('URL_SERVICE')
 ]
 
 app.add_middleware(
@@ -41,21 +44,11 @@ app.include_router(users.router, prefix="/v1/user")
 app.include_router(chat.router, prefix="/v1")
 
 @app.get('/')
-async def root():
+async def root(req: Request):
     
     message = app.twilio.messages.create(
     to="+12034828850", 
     from_=os.getenv('TWILIO_NUMBER'),
     body="Hello from Python!")
     
-    print(message.sid)
-    
     return {'message': message}
-
-@app.post('/{short_url}')
-def redirection(req: Request, res: Response, short_url):
-    long_url = req.app.db['urls']({"short":short_url})
-    if long_url:
-        return RedirectResponse(long_url.long, status.HTTP_303_SEE_OTHER)
-    else:
-        return f'<h1>Url doesnt exist</h1>'

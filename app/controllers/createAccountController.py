@@ -2,6 +2,7 @@ from fastapi import status
 from fastapi.encoders import jsonable_encoder
 import os
 import bcrypt
+from amplitude import *
 
 async def createAccountController(req, res, user):
     #Basic forms of validation
@@ -24,17 +25,35 @@ async def createAccountController(req, res, user):
     user.email = user.email.lower()
     
     #this allows us to send the newUser to the database
-    newUser = jsonable_encoder(user)
+    fromPhoneLink = user.fromPhoneLink
+    
+    newUser = {
+        'email': user.email,
+        'phoneNumber': user.phoneNumber,
+        'password': user.password
+    }
+    
+    newUser = jsonable_encoder(newUser)
     
     #send user to the database
     response = req.app.db['users'].insert_one(newUser)        
-    
+    newUser = req.app.db['users'].find_one({'email':newUser.get('email')})
     if response.acknowledged == True:
-        req.app.twilio.messages.create(
-                to=user.phoneNumber, 
-                from_=os.getenv('TWILIO_NUMBER'),
-                body="your account has been created. Rexly is now at your service!"
-        )
+        #req.app.twilio.messages.create(
+        #        to=user.phoneNumber, 
+        #        from_=os.getenv('TWILIO_NUMBER'),
+        #        body="your account has been created. Rexly is now at your service!"
+        #)
+        
+        req.app.amplitude.track(BaseEvent(
+            event_type='User SignUp',
+            user_id=str(newUser['_id']),
+            event_properties={
+                'fromPhoneLink': fromPhoneLink
+            }
+        ))
+        
+        req.app.amplitude.shutdown()
         return "ok"
     
     #if user isn't saved to the database then we go here and return error to where user came from.
