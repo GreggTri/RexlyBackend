@@ -8,7 +8,6 @@
 # misc
 .DS_Store
 *.pem
-/SchemaDB
 
 # debug
 */npm-debug.log*
