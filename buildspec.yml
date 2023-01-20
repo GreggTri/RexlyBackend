@@ -14,3 +14,8 @@ phases:
   build:
     commands:
     - echo Executing Build Phase
+
+artifacts:
+  files:
+    - '**/*'
+    name: Rexlybackend-$(date +%Y-%m-%d)
