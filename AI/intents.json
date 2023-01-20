@@ -21,20 +21,23 @@
                 "any pink iphone cases",
                 "i need a gray pair of jeans around 50",
                 "glass cups",
-                "paper towels",
                 "old spice deodorant",
                 "i need a luxury stool for 75",
                 "a microwave",
+                "what about a measuring tape",
                 "what about spoons that are 50 dollars",
                 "what about some heated blankets",
-                "what kind of monitors do you have?"
+                "what kind of monitors do you have?",
+                "can you find the best paper towels for me",
+                "can you me some really good crackers"
             ],
             "responses": [
                 "Here are the top 4 products that I found!",
                 "Here's 4 of the best products I could find!",
                 "the 4 best products that match your search are",
-                "The top 4 products are: ",
-                "I found these 4 to choose from: "
+                "The top 4 products are:",
+                "I found these 4 to choose from:",
+                "These are the best 4 options I could find:"
             ],
             "action": "search_query"
         },
@@ -44,29 +47,15 @@
                 "what is rexly",
                 "How does rexly work",
                 "how does this work",
-                "what do you do"
+                "what do you do",
+                "Where do you guys source these products from?",
+                "Do you guys source your product from walmart?"
             ],
             "responses": [
-                "I am a robot that really likes helping people find the best products for their needs",
-                "I search for the products that you tell me to and find the best ones that I can find"
+                "I search for the products that you tell me to on Walmart and find the best ones to show you",
+                "I look for products on Walmart for the products you tell me to search for."
             ],
             "action": ""
-        },
-        {
-            "tag": "next best product",
-            "patterns": [
-                "can I more products like product 1",
-                "any more products like the second product?",
-                "can i see the next best product",
-                "any other products just like the third one?",
-                "can you find me one just like the second one",
-                "anything like the last one? but just slightly different"
-            ],
-            "responses": [
-                "here's the next best product that I found",
-                "Here's a products that is very similar to the first one you liked"
-            ],
-            "action": "nextbestproduct"
         },
         {
             "tag": "feedback",
@@ -86,10 +75,27 @@
                 "good job!",
                 "wow, this is actually works",
                 "these are terrible products",
-                "why would you show me these products"
+                "why would you show me these products",
+                "wow, that's really cool!"
             ],
             "responses": [
                 "Thank you for your feedback, I'll be sure to let my superiors know!"
+            ],
+            "action": ""
+        },
+        {
+            "tag": "DeleteAccount",
+            "patterns": [
+                "I don't want to use this service anymore",
+                "How do I delete my account?",
+                "what do I do to stop using rexly?",
+                "what do I do to delete my account",
+                "i want to get rid of my account",
+                "how do I go about deleting my account?",
+                "is it possible to delete my account?"
+            ],
+            "responses": [
+                "If you would like to stop using Rexly, feel free to send an email to support@rexly.co with your registered email and we'll delete your account promptly"
             ],
             "action": ""
         },
