@@ -1,6 +1,7 @@
 from .shortenedUrlLetters import shortenedUrlLetters
 from fastapi.encoders import jsonable_encoder
 import os
+import datetime
 from dotenv import load_dotenv
 
 def retrieveShortURL(req, user_id, long_url):
@@ -14,7 +15,8 @@ def retrieveShortURL(req, user_id, long_url):
         newURL = {
             "user_id": user_id,
             "long": long_url,
-            "short": short_url
+            "short": short_url,
+            'created_At': datetime.datetime.utcnow()
         }
         newURL = jsonable_encoder(newURL)
         response = req.app.db['urls'].insert_one(newURL)

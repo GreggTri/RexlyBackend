@@ -2,6 +2,7 @@ from fastapi import status
 from fastapi.encoders import jsonable_encoder
 import os
 import bcrypt
+import datetime
 from amplitude import *
 
 async def createAccountController(req, res, user):
@@ -30,7 +31,8 @@ async def createAccountController(req, res, user):
     newUser = {
         'email': user.email,
         'phoneNumber': user.phoneNumber,
-        'password': user.password
+        'password': user.password,
+        'created_At': datetime.datetime.utcnow()
     }
     
     newUser = jsonable_encoder(newUser)
@@ -45,15 +47,15 @@ async def createAccountController(req, res, user):
         #        body="your account has been created. Rexly is now at your service!"
         #)
         
-        req.app.amplitude.track(BaseEvent(
-            event_type='User SignUp',
-            user_id=str(newUser['_id']),
-            event_properties={
-                'fromPhoneLink': fromPhoneLink
-            }
-        ))
+        #req.app.amplitude.track(BaseEvent(
+        #    event_type='User SignUp',
+        #    user_id=str(newUser['_id']),
+        #    event_properties={
+        #        'fromPhoneLink': fromPhoneLink
+        #    }
+        #))
         
-        req.app.amplitude.shutdown()
+        #req.app.amplitude.shutdown()
         return "ok"
     
     #if user isn't saved to the database then we go here and return error to where user came from.

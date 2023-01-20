@@ -2,6 +2,7 @@ from fastapi import status
 import traceback
 from twilio.twiml.messaging_response import MessagingResponse, Message
 from amplitude import *
+import datetime
 from AI.botRunner import rexlyBot
 from utils.createLink import createLink
 from utils.retrieveShortURL import retrieveShortURL
@@ -71,7 +72,8 @@ async def chatController(req, res, incomingMsg):
             "user_msg": incomingMsg.Body,
             "tag": botResponse.get('tag'),
             "bot_response": botResponse.get('intentResult'),
-            "probability_response": botResponse.get('probRes')
+            "probability_response": botResponse.get('probRes'),
+            'created_At': datetime.datetime.utcnow()
         }
         
         response = req.app.db['messages'].insert_one(msgDoc)

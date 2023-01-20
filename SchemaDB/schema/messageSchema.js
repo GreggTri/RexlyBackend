@@ -6,7 +6,7 @@ const MessageSchema = new mongoose.Schema({
     tag: {type: String, required: true},
     bot_response: {type: String, required: true},
     probability_response: {type: String},
+    createdAt: { type: Date, default: Date.now, required: true }
 })
 
-MessageSchema.set('timestamps', true)
 module.exports = mongoose.model('messages', MessageSchema)
