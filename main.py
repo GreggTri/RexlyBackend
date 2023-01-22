@@ -43,12 +43,19 @@ app.add_middleware(
 app.include_router(users.router, prefix="/v1/user")
 app.include_router(chat.router, prefix="/v1")
 
+# For elb healthcheck
 @app.get('/')
-async def root(req: Request):
+async def root(req: Request, res: Response):
     
-    message = app.twilio.messages.create(
-    to="+12034828850", 
-    from_=os.getenv('TWILIO_NUMBER'),
-    body="Hello from Python!")
+    #message = app.twilio.messages.create(
+    #to="+12034828850", 
+    #from_=os.getenv('TWILIO_NUMBER'),
+    #body="Hello from Python!")
     
-    return {'message': message}
+    res.status_code = status.HTTP_200_OK
+    return 'ok'
+
+# so we can ignore the favicon
+@app.get('/favicon.ico', status_code=204)
+def ignoreFavicon():
+    pass
