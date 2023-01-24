@@ -46,12 +46,6 @@ app.include_router(chat.router, prefix="/v1")
 # For elb healthcheck
 @app.get('/')
 async def root(req: Request, res: Response):
-    
-    #message = app.twilio.messages.create(
-    #to="+12034828850", 
-    #from_=os.getenv('TWILIO_NUMBER'),
-    #body="Hello from Python!")
-    
     res.status_code = status.HTTP_200_OK
     return 'ok'
 
