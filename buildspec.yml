@@ -6,6 +6,9 @@ phases:
       python: 3.8
     commands:
     - echo Executing Install Phase
+    - python -m venv ~/.venv
+    - source ~/.venv/bin/activate
+    - pip install --upgrade pip
 
   pre_build:
     commands:
@@ -18,4 +21,3 @@ phases:
 artifacts:
   files:
     - '**/*'
-  name: Rexlybackend-$(date +%Y-%m-%d)
