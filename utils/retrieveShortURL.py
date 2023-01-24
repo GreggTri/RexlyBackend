@@ -9,7 +9,7 @@ def retrieveShortURL(req, user_id, long_url):
     found_url = req.app.db({"long":long_url, "user_id":user_id})
 
     if found_url:
-        return f"{os.getenv('URL_DEV_LINK')}{found_url.short}"
+        return f"{os.getenv('URL_SERVICE')}/{found_url.short}"
     else:
         short_url = shortenedUrlLetters(req)
         newURL = {
@@ -22,6 +22,6 @@ def retrieveShortURL(req, user_id, long_url):
         response = req.app.db['urls'].insert_one(newURL)
         
         if response.acknowledged == True:
-            return f"{os.getenv('URL_DEV_LINK')}{short_url}"
+            return f"{os.getenv('URL_SERVICE')}/{short_url}"
         else:
             return "Sorry, couldn't get a link"
