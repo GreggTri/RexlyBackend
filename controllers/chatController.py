@@ -7,29 +7,26 @@ from AI.botRunner import rexlyBot
 from utils.createLink import createLink
 from utils.retrieveShortURL import retrieveShortURL
 
-#this is a model schema for what the incoming request will look like
-
-# incomingMsg holds 2 variables
-# user_msg: string
-# phoneNumber: string
-async def chatController(req, res, incomingMsg):
+# req holds all the twilio info being sent, find out more here:
+# https://www.twilio.com/docs/messaging/guides/webhook-request#parameters-in-twilios-request-to-your-application
+async def chatController(req, res):
     #check if user has an account if not send create account link
     response = MessagingResponse()
     message = Message()
     try:
         
-        if incomingMsg.Body is None or incomingMsg.From is None:
+        if req.Body is None or req.From is None:
             res.status_code = status.HTTP_404_NOT_FOUND
             return "[404 Error]: Request data not found"
        
-        userExists = req.app.db['users'].find_one({"phoneNumber":incomingMsg.From}, {'_id'})
+        userExists = req.app.db['users'].find_one({"phoneNumber":req.From}, {'_id'})
         if not userExists:
-            link = await createLink(incomingMsg.From)
+            link = await createLink(req.From)
             response.message(f"Hey! It seems you don't have an account yet. Here's a link to sign up! {link}")
             return str(response)
         
         #sends msg to Rexly
-        botResponse = await rexlyBot(incomingMsg.Body)
+        botResponse = await rexlyBot(req.Body)
         
         if botResponse.get('search') == "400 Error":
             res.status_code = status.HTTP_400_BAD_REQUEST
@@ -63,7 +60,7 @@ async def chatController(req, res, incomingMsg):
         #creates doc to send to DB
         msgDoc = {
             "user_id": userExists['_id'],
-            "user_msg": incomingMsg.Body,
+            "user_msg": req.Body,
             "tag": botResponse.get('tag'),
             "bot_response": botResponse.get('intentResult'),
             "probability_response": botResponse.get('probRes'),
