@@ -32,12 +32,12 @@
                 "can you me some really good crackers"
             ],
             "responses": [
-                "Here are the top 4 products that I found!",
-                "Here's 4 of the best products I could find!",
-                "the 4 best products that match your search are",
-                "The top 4 products are:",
-                "I found these 4 to choose from:",
-                "These are the best 4 options I could find:"
+                "Here are the top products that I found!",
+                "Here's the best products I could find!",
+                "the best products that match your search are",
+                "The top products I found are:",
+                "I found these products to choose from:",
+                "These are the best options I could find:"
             ],
             "action": "search_query"
         },

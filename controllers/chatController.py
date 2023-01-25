@@ -26,7 +26,7 @@ async def chatController(req, res, incomingMsg):
         if not userExists:
             link = await createLink(incomingMsg.From)
             response.message(f"Hey! It seems you don't have an account yet. Here's a link to sign up! {link}")
-            return f"Create Account Link Sent"
+            return str(response)
         
         #sends msg to Rexly
         botResponse = await rexlyBot(incomingMsg.Body)
@@ -42,25 +42,19 @@ async def chatController(req, res, incomingMsg):
             
         #formatts response for text
         if "search" in botResponse:
-            #basic formatting for text message
-            message.body(f"{botResponse.get('intentResult')}")
-            message.body(f"1: {botResponse.get('search', {})[0].get('name')} - ${botResponse.get('search', {})[0].get('salePrice')}")
-            #lets not do this for now to save money and see how it goes. this is for sending pictures
-            #message.media(botResponse.get('search')[0].get('mediumImage'))
-            message.body(await retrieveShortURL(req, userExists['_id'],botResponse.get('search')[0].get('productTrackingUrl')))
-            
-            message.body(f"2: {botResponse.get('search', {})[1].get('name')} - ${botResponse.get('search', {})[1].get('salePrice')}")
-            #message.media(botResponse.get('search')[0].get('mediumImage'))
-            message.body(await retrieveShortURL(req, userExists['_id'], botResponse.get('search')[1].get('productTrackingUrl')))
-            
-            message.body(f"3: {botResponse.get('search', {})[2].get('name')} - ${botResponse.get('search', {})[2].get('salePrice')}")
-            #message.media(botResponse.get('search')[0].get('mediumImage'))
-            message.body(await retrieveShortURL(req, userExists['_id'], botResponse.get('search')[2].get('productTrackingUrl')))
-            
-            message.body(f"4: {botResponse.get('search', {})[3].get('name')} - ${botResponse.get('search', {})[3].get('salePrice')}")
-            #message.media(botResponse.get('search')[0].get('mediumImage'))
-            message.body(await retrieveShortURL(req, userExists['_id'], botResponse.get('search')[3].get('productTrackingUrl')))
-            response.append(message)
+            if len(botResponse.get('search', {})[0]) == 0:
+                response.message("Sorry, I couldn't find any products that fit your search")
+            else:
+                #basic formatting for text message
+                message.body(f"{botResponse.get('intentResult')}")
+                
+                for i in botResponse['search']:
+                    message.body(f"{i + 1}: {botResponse.get('search', {})[i].get('name')} - ${botResponse.get('search', {})[i].get('salePrice')}")
+                    #lets not do this for now to save money and see how it goes. this is for sending pictures
+                    #message.media(botResponse.get('search')[0].get('mediumImage'))
+                    message.body(await retrieveShortURL(req, userExists['_id'],botResponse.get('search')[i].get('productTrackingUrl')))
+                    
+                response.append(message)
         #elif "nbp" in botResponse:
         #    response.message(f"")
         else:
@@ -88,13 +82,14 @@ async def chatController(req, res, incomingMsg):
                 }
             ))
             req.app.amplitude.shutdown()
-            return "ok"
+            return str(response)
 
         res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return f"[500 Error]: Internal Server Error"
+        response.message(f"Sorry friend, I ran into an error. Please try again. If this issue persists please contact us at support@rexly.co")
+        return str(response)
     
     except Exception as e:
         res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         print(e)
         response.message(f"Sorry friend, I ran into an error. Please try again. If this issue persists please contact us at support@rexly.co")
-        return f"[500 Error]: Internal Server Error"
+        return str(response)

@@ -28,6 +28,9 @@ async def createAccountController(req, res, user):
     #this allows us to send the newUser to the database
     fromPhoneLink = user.fromPhoneLink
     
+    #if from phonelink it comes with "+1" if it request comes from website then id doesn't so we have to add it
+    user.phoneNumber = user.phoneNumber if fromPhoneLink else '+1' + user.phoneNumber
+    
     newUser = {
         'email': user.email,
         'phoneNumber': user.phoneNumber,
