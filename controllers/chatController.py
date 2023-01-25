@@ -13,20 +13,22 @@ async def chatController(req, res):
     #check if user has an account if not send create account link
     response = MessagingResponse()
     message = Message()
+    
+    request = await req.json()
     try:
         
-        if req.Body is None or req.From is None:
+        if request['Body'] is None or request['From'] is None:
             res.status_code = status.HTTP_404_NOT_FOUND
             return "[404 Error]: Request data not found"
        
-        userExists = req.app.db['users'].find_one({"phoneNumber":req.From}, {'_id'})
+        userExists = req.app.db['users'].find_one({"phoneNumber":request['From']}, {'_id'})
         if not userExists:
-            link = await createLink(req.From)
+            link = await createLink(request.From)
             response.message(f"Hey! It seems you don't have an account yet. Here's a link to sign up! {link}")
             return str(response)
         
         #sends msg to Rexly
-        botResponse = await rexlyBot(req.Body)
+        botResponse = await rexlyBot(request['Body'])
         
         if botResponse.get('search') == "400 Error":
             res.status_code = status.HTTP_400_BAD_REQUEST
@@ -60,16 +62,16 @@ async def chatController(req, res):
         #creates doc to send to DB
         msgDoc = {
             "user_id": userExists['_id'],
-            "user_msg": req.Body,
+            "user_msg": request['Body'],
             "tag": botResponse.get('tag'),
             "bot_response": botResponse.get('intentResult'),
             "probability_response": botResponse.get('probRes'),
             'created_At': datetime.datetime.utcnow()
         }
         
-        response = req.app.db['messages'].insert_one(msgDoc)
+        DBresponse = req.app.db['messages'].insert_one(msgDoc)
 
-        if response.acknowledged == True:
+        if DBresponse.acknowledged == True:
             
             req.app.amplitude.track(BaseEvent(
                 event_type='User Message',
@@ -81,12 +83,13 @@ async def chatController(req, res):
             req.app.amplitude.shutdown()
             return str(response)
 
-        res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        res.status_code = status.HTTP_200_OK
         response.message(f"Sorry friend, I ran into an error. Please try again. If this issue persists please contact us at support@rexly.co")
         return str(response)
     
     except Exception as e:
         res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        traceback.print_exception
         print(e)
         response.message(f"Sorry friend, I ran into an error. Please try again. If this issue persists please contact us at support@rexly.co")
         return str(response)

@@ -11,7 +11,7 @@ async def rexlyBot(message):
         intents = json.load(json_data)
         
     FILE = "AI/RexlyAI.pth"
-    data = torch.load(FILE)
+    data = torch.load(FILE, map_location=torch.device('cpu'))
 
     #we need these variables from the Rexly file to give the neural network
     input_size = data["input_size"]
