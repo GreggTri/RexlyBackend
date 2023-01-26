@@ -6,11 +6,17 @@ import os
 from dotenv import load_dotenv
 from twilio.rest import Client
 from amplitude import *
+import logging
 
 # Your Account SID from twilio.com/console
 account_sid = os.getenv('TWILIO_ACCOUNT_TOKEN')
 # Your Auth Token from twilio.com/console
 auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
+
+logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
+
+logger = logging.getLogger(__name__)  # the __name__ resolve to "main" since we are at the root of the project. 
+# This will get the root logger since no logger in the configuration has this name.
 
 load_dotenv()
 from routers import users, chat
@@ -47,6 +53,8 @@ app.include_router(chat.router, prefix="/v1")
 @app.get('/')
 async def root(req: Request, res: Response):
     res.status_code = status.HTTP_200_OK
+    logger.info("echoing something from the uicheckapp logger")
+    
     return 'ok'
 
 # so we can ignore the favicon

@@ -53,7 +53,7 @@
             ],
             "responses": [
                 "I search for the products that you tell me to on Walmart and find the best ones to show you",
-                "I look for products on Walmart for the products you tell me to search for."
+                "I look for products on Walmart that you tell me to search for and find the best ones."
             ],
             "action": ""
         },
