@@ -1,8 +1,9 @@
+from fastapi import Request
 import random
 import string
 import os
 
-def shortenedUrlLetters(req):
+def shortenedUrlLetters(req: Request):
     letters = string.ascii_lowercase + string.ascii_uppercase
     while True:
         rand_letters = random.choices(letters, k=5)

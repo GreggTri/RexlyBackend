@@ -7,6 +7,7 @@ import datetime
 from AI.botRunner import rexlyBot
 from utils.createLink import createLink
 from utils.retrieveShortURL import retrieveShortURL
+import sys
 import logging
 logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
@@ -18,7 +19,7 @@ async def chatController(req: Request, res: Response):
     response = MessagingResponse()
     message = Message()
 
-    
+     
     try:
         userMsg = await req.json() #turns response body to json
         #we then give then individual variables because computer was being dumb
@@ -41,28 +42,32 @@ async def chatController(req: Request, res: Response):
         #this is to check if we got an error from the ReatilerIntegrations API
         if botResponse.get('search') == "400 Error":
             logger.error("Search returned 400 Error")
-            res.status_code = status.HTTP_400_BAD_REQUEST
-            response.message("Sorry friend, I ran into an error. Please try again. If this issue persists please contact us at support@rexly.co")
-            return "[400 Error] Bad Request"
+            res.status_code = status.HTTP_200_OK
+            response.message("Sorry friend, I ran into an error when looking for this product. If this issue persists please contact us at support@rexly.co")
+            return str(response)
         elif botResponse.get('search') == "500 Error":
             logger.critical("Search returned 500 Error")
-            res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-            response.message("Sorry friend, I ran into an error. Please try again. If this issue persists please contact us at support@rexly.co")
-            return "[400 Error] Bad Request"
-            
+            res.status_code = status.HTTP_200_OK
+            response.message("Sorry friend, I ran into an error when looking for this product. If this issue persists please contact us at support@rexly.co")
+            return str(response)
+        
+        #we turn search array into a json object here because we know that it's not a string
+        #we don't want a string because the error handling above is sent via a string through the search attribute
+        botResponse['search'] = botResponse['search'].json()
+        
         #formatts response for text
         if "search" in botResponse:
-            if len(botResponse.get('search', {})[0]) == 0:
+            if len(botResponse.get('search')) == 0:
                 response.message("Sorry, I couldn't find any products that fit your search")
             else:
                 #this is to build the entire response for the user
                 message.body(f"{botResponse.get('intentResult')}")
                 
-                for i in botResponse['search']:
-                    message.body(f"{i + 1}: {botResponse.get('search', {})[i].get('name')} - ${botResponse.get('search', {})[i].get('salePrice')}")
+                for index, product in enumerate(botResponse.get('search', {})):
+                    message.body(f"{index + 1}: {product.get('name')} - ${product.get('salePrice')}")
                     #lets not do this for now to save money and see how it goes. this is for sending pictures
-                    #message.media(botResponse.get('search')[0].get('mediumImage'))
-                    message.body(await retrieveShortURL(req, userExists['_id'],botResponse.get('search')[i].get('productTrackingUrl')))
+                    #message.media(product.get('mediumImage'))
+                    message.body(retrieveShortURL(req, userExists['_id'], product.get('productTrackingUrl')))
                 
                 #we then put the entire response into the messaginsResponse object
                 response.append(message)  
@@ -101,7 +106,7 @@ async def chatController(req: Request, res: Response):
         return str(response)
     
     except Exception as e:
-        logger.critical(f"\n[Error]: {e}")
+        logger.critical(f"\n[Error]: {e}, {traceback.format_exc()}")
         res.status_code = status.HTTP_200_OK #we must return 200 regardless or message won't be sent
         response.message(f"Sorry friend, I ran into an error. Please try again. If this issue persists please contact us at support@rexly.co")
         return str(response)

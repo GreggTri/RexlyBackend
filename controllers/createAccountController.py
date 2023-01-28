@@ -44,11 +44,11 @@ async def createAccountController(req, res, user):
     response = req.app.db['users'].insert_one(newUser)        
     newUser = req.app.db['users'].find_one({'email':newUser.get('email')})
     if response.acknowledged == True:
-        #req.app.twilio.messages.create(
-        #        to=user.phoneNumber, 
-        #        from_=os.getenv('TWILIO_NUMBER'),
-        #        body="your account has been created. Rexly is now at your service!"
-        #)
+        req.app.twilio.messages.create(
+                to=user.phoneNumber, 
+                from_=os.getenv('TWILIO_NUMBER'),
+                body="your account has been created. Rexly is now at your service!"
+        )
         
         req.app.amplitude.track(BaseEvent(
             event_type='User SignUp',

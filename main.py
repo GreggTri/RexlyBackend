@@ -53,8 +53,6 @@ app.include_router(chat.router, prefix="/v1")
 @app.get('/')
 async def root(req: Request, res: Response):
     res.status_code = status.HTTP_200_OK
-    logger.info("echoing something from the uicheckapp logger")
-    
     return 'ok'
 
 # so we can ignore the favicon
