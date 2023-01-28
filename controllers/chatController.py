@@ -18,8 +18,7 @@ async def chatController(req: Request, res: Response, From: str = Form(...), Bod
     #check if user has an account if not send create account link
     response = MessagingResponse()
     message = Message()
-
-     
+    
     try:
         userNumber = From
 
