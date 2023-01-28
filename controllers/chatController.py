@@ -1,4 +1,4 @@
-from fastapi import status, Request, Response
+from fastapi import status, Request, Response, Form
 import traceback
 import json
 from twilio.twiml.messaging_response import MessagingResponse, Message
@@ -14,19 +14,16 @@ logger = logging.getLogger(__name__)
 
 # req holds all the twilio info being sent, find out more here:
 # https://www.twilio.com/docs/messaging/guides/webhook-request#parameters-in-twilios-request-to-your-application
-async def chatController(req: Request, res: Response):
+async def chatController(req: Request, res: Response, From: str = Form(...), Body: str = Form(...)):
     #check if user has an account if not send create account link
     response = MessagingResponse()
     message = Message()
 
      
     try:
-        userMsg = await req.json() #turns response body to json
-        #we then give then individual variables because computer was being dumb
-        body = userMsg['Body'] 
-        userNumber = userMsg['From']
+        userNumber = From
 
-        if body is None or userNumber is None:
+        if Body is None or userNumber is None:
             res.status_code = status.HTTP_404_NOT_FOUND
             return "[404 Error]: Request data not found"
        
@@ -37,7 +34,7 @@ async def chatController(req: Request, res: Response):
             return str(response)
         
         #sends msg to Rexly
-        botResponse = await rexlyBot(body)
+        botResponse = await rexlyBot(Body)
         
         #this is to check if we got an error from the ReatilerIntegrations API
         if botResponse.get('search') == "400 Error":
@@ -51,12 +48,14 @@ async def chatController(req: Request, res: Response):
             response.message("Sorry friend, I ran into an error when looking for this product. If this issue persists please contact us at support@rexly.co")
             return str(response)
         
-        #we turn search array into a json object here because we know that it's not a string
-        #we don't want a string because the error handling above is sent via a string through the search attribute
-        botResponse['search'] = botResponse['search'].json()
+        
         
         #formatts response for text
         if "search" in botResponse:
+            #we turn search array into a json object here because we know that it's not a string
+            #we don't want a string because the error handling above is sent via a string through the search attribute
+            botResponse['search'] = botResponse['search'].json()
+            
             if len(botResponse.get('search')) == 0:
                 response.message("Sorry, I couldn't find any products that fit your search")
             else:
@@ -79,7 +78,7 @@ async def chatController(req: Request, res: Response):
         #creates doc to send to DB
         msgDoc = {
             "user_id": userExists['_id'],
-            "user_msg": body,
+            "user_msg": Body,
             "tag": botResponse.get('tag'),
             "bot_response": botResponse.get('intentResult'),
             "probability_response": botResponse.get('probRes'),
