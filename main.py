@@ -6,11 +6,17 @@ import os
 from dotenv import load_dotenv
 from twilio.rest import Client
 from amplitude import *
+import logging
 
 # Your Account SID from twilio.com/console
 account_sid = os.getenv('TWILIO_ACCOUNT_TOKEN')
 # Your Auth Token from twilio.com/console
 auth_token  = os.getenv('TWILIO_AUTH_TOKEN')
+
+logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
+
+logger = logging.getLogger(__name__)  # the __name__ resolve to "main" since we are at the root of the project. 
+# This will get the root logger since no logger in the configuration has this name.
 
 load_dotenv()
 from routers import users, chat
@@ -43,12 +49,13 @@ app.add_middleware(
 app.include_router(users.router, prefix="/v1/user")
 app.include_router(chat.router, prefix="/v1")
 
+# For elb healthcheck
 @app.get('/')
-async def root(req: Request):
-    
-    message = app.twilio.messages.create(
-    to="+12034828850", 
-    from_=os.getenv('TWILIO_NUMBER'),
-    body="Hello from Python!")
-    
-    return {'message': message}
+async def root(req: Request, res: Response):
+    res.status_code = status.HTTP_200_OK
+    return 'ok'
+
+# so we can ignore the favicon
+@app.get('/favicon.ico', status_code=204)
+def ignoreFavicon():
+    pass

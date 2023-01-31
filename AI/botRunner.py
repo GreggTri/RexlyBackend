@@ -2,6 +2,7 @@ import httpx
 import random
 import json
 import torch
+import os
 
 from AI.model import NeuralNet
 from AI.utils import tokenize, bag_of_words
@@ -11,7 +12,7 @@ async def rexlyBot(message):
         intents = json.load(json_data)
         
     FILE = "AI/RexlyAI.pth"
-    data = torch.load(FILE)
+    data = torch.load(FILE, map_location=torch.device('cpu'))
 
     #we need these variables from the Rexly file to give the neural network
     input_size = data["input_size"]
@@ -48,13 +49,13 @@ async def rexlyBot(message):
                 if intent["action"] == "search_query":
                     #we sent a request to search API and get aresponse of products that were searched
                     async with httpx.AsyncClient() as client:
-                        response = await client.post("http://localhost:5000/api/v1/search", data={"query": message})
+                        response = await client.post(f"{os.getenv('RETAILER_API')}/api/v1/search", data={"query": message})
                         if response.status_code == 500:
-                            return "500 Error"
+                            response = "500 Error"
                         elif response.status_code == 400:
-                            return "400 Error"
-                        response = response.json() #turns response into json format
-                    
+                            response = "400 Error"
+                        #response = response.json() #turns response into json format
+
                     return {
                         "intentResult": random.choice(intent['responses']),
                         "search": response,
