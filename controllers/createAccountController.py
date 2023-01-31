@@ -53,7 +53,7 @@ async def createAccountController(req, res, user):
         req.app.twilio.messages.create(
                 to=user.phoneNumber, 
                 from_=os.getenv('TWILIO_NUMBER'),
-                body="your account has been created. Rexly is now at your service!"
+                body="your account has been created. Rexly is now at your service! if you would like to stop using rexly, please send us an email at support@rexly.co"
         )
         
         req.app.amplitude.track(BaseEvent(

@@ -29,7 +29,7 @@ async def chatController(req: Request, res: Response, From: str = Form(...), Bod
         userExists = req.app.db['users'].find_one({"phoneNumber":userNumber}, {'_id'})
         if not userExists:
             link = createLink(userNumber)
-            response.message(f"Hey! It seems you don't have an account yet. Here's a link to sign up! {link}")
+            response.message(f"Hey! It seems you don't have an account yet. In order to use our service, you must have an account. Here's a link to sign up! {link}")
             return str(response)
         
         #sends msg to Rexly
