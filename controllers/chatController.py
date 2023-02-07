@@ -36,24 +36,17 @@ async def chatController(req: Request, res: Response, From: str = Form(...), Bod
         botResponse = await rexlyBot(Body)
         
         #this is to check if we got an error from the ReatilerIntegrations API
-        if botResponse.get('search') == "400 Error":
-            logger.error("Search returned 400 Error")
+        if botResponse.get('search') == False:
+            #logger.error("Search returned Error")
             res.status_code = status.HTTP_200_OK
             response.message("Sorry friend, I ran into an error when looking for this product. If this issue persists please contact us at support@rexly.co")
             return str(response)
-        elif botResponse.get('search') == "500 Error":
-            logger.critical("Search returned 500 Error")
-            res.status_code = status.HTTP_200_OK
-            response.message("Sorry friend, I ran into an error when looking for this product. If this issue persists please contact us at support@rexly.co")
-            return str(response)
-        
-        
         
         #formatts response for text
         if "search" in botResponse:
             #we turn search array into a json object here because we know that it's not a string
             #we don't want a string because the error handling above is sent via a string through the search attribute
-            botResponse['search'] = botResponse['search'].json()
+            #botResponse['search'] = botResponse['search'].json()
             
             if len(botResponse.get('search')) == 0:
                 response.message("Sorry, I couldn't find any products that fit your search")
