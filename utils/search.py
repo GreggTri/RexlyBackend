@@ -63,7 +63,7 @@ async def searchRetailers(query):
             totalCount = response_WAL['totalResults']
             
             for i in range(len(response_WAL['items'])):   
-                if response_WAL['items'][i].get('numReviews') is not None and (float(response_WAL['items'][i]['salePrice']) <= maxPrice or maxPrice is None):
+                if response_WAL['items'][i].get('numReviews') is not None and (maxPrice is None or float(response_WAL['items'][i]['salePrice']) <= maxPrice):
                     
                     #add only the necessary fields
                     #for complete list of fields go here: https://walmart.io/docs/affiliate/search
@@ -89,7 +89,7 @@ async def searchRetailers(query):
         
         return {
             "success": True,
-            "data": bestItems[:4]
+            "data": bestItems[:3]
             }
         
     except Exception as e:

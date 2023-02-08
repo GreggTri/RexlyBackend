@@ -35,18 +35,14 @@ async def chatController(req: Request, res: Response, From: str = Form(...), Bod
         #sends msg to Rexly
         botResponse = await rexlyBot(Body)
         
-        #this is to check if we got an error from the ReatilerIntegrations API
+        #this is to check if we got an error from walmart search
         if botResponse.get('search') == False:
-            #logger.error("Search returned Error")
             res.status_code = status.HTTP_200_OK
             response.message("Sorry friend, I ran into an error when looking for this product. If this issue persists please contact us at support@rexly.co")
             return str(response)
         
         #formatts response for text
         if "search" in botResponse:
-            #we turn search array into a json object here because we know that it's not a string
-            #we don't want a string because the error handling above is sent via a string through the search attribute
-            #botResponse['search'] = botResponse['search'].json()
             
             if len(botResponse.get('search')) == 0:
                 response.message("Sorry, I couldn't find any products that fit your search")
@@ -55,10 +51,10 @@ async def chatController(req: Request, res: Response, From: str = Form(...), Bod
                 message.body(f"{botResponse.get('intentResult')}")
                 
                 for index, product in enumerate(botResponse.get('search', {})):
-                    message.body(f"{index + 1}: {product.get('name')} - ${product.get('salePrice')}")
+                    message.body(f"\n{index + 1}: {product.get('name')}\n${product.get('salePrice')}")
                     #lets not do this for now to save money and see how it goes. this is for sending pictures
                     #message.media(product.get('mediumImage'))
-                    message.body(retrieveShortURL(req, userExists['_id'], product.get('productTrackingUrl')))
+                    message.body(f"\n{retrieveShortURL(req, userExists['_id'], product.get('productTrackingUrl'))}")
                 
                 #we then put the entire response into the messaginsResponse object
                 response.append(message)  
