@@ -28,6 +28,8 @@ def generateWalmartHeaders():
         signature = signer.sign(hash_obj)
         signature_enc = base64.b64encode(signature).decode()
         
+        logger.info(privateKey)
+        logger.info(os.getenv('RSA_PRIVATE_KEY'))
         return {
             "WM_SEC.AUTH_SIGNATURE": signature_enc,
             "WM_CONSUMER.INTIMESTAMP": hashList["WM_CONSUMER.INTIMESTAMP"],
@@ -36,7 +38,7 @@ def generateWalmartHeaders():
         }
         
     except Exception as e:
-        logger.critical(f"{e}", exc_info=True)
+        logger.critical(f"{e} {privateKey}, {os.getenv('RSA_PRIVATE_KEY')}", exc_info=True)
         return False
 
 
