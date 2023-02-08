@@ -3,9 +3,14 @@ import random
 import json
 import torch
 import os
+import logging 
 
 from AI.model import NeuralNet
 from AI.utils import tokenize, bag_of_words
+from utils.search import searchRetailers
+
+logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
+logger = logging.getLogger(__name__)
 
 async def rexlyBot(message):
     with open('AI/intents.json', 'r') as json_data:
@@ -48,20 +53,22 @@ async def rexlyBot(message):
             if tag == intent["tag"]:
                 if intent["action"] == "search_query":
                     #we sent a request to search API and get aresponse of products that were searched
-                    async with httpx.AsyncClient() as client:
-                        response = await client.post(f"{os.getenv('RETAILER_API')}/api/v1/search", data={"query": message})
-                        if response.status_code == 500:
-                            response = "500 Error"
-                        elif response.status_code == 400:
-                            response = "400 Error"
-                        #response = response.json() #turns response into json format
-
-                    return {
-                        "intentResult": random.choice(intent['responses']),
-                        "search": response,
-                        "tag": tag,
-                        "probRes": f"{prob.item():.4f}"
-                    }
+                    response = await searchRetailers(message)
+                    
+                    if response['success'] == True:
+                        return {
+                            "intentResult": random.choice(intent['responses']),
+                            "search": response['data'],
+                            "tag": tag,
+                            "probRes": f"{prob.item():.4f}"
+                        }
+                    else:
+                        return {
+                            "intentResult": random.choice(intent['responses']),
+                            "search": response['success'],
+                            "tag": tag,
+                            "probRes": f"{prob.item():.4f}"
+                        }
                 #elif intent["action"] == "nextbestproduct":
                 #    async with httpx.AsyncClient() as client:
                 #        #obviously change to nbp endpoint when possible
