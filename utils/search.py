@@ -60,6 +60,12 @@ async def searchRetailers(query):
             url = f"search?publisherId={os.getenv('PUBLISHER_ID')}&query={query}&start={a}&numItems=25&responseGroup=full&facet=on&facet.filter=availableOnline:true&facet.filter=stock:Available"
             response_WAL = await walmartAPI(f"{url}{facetColor}")
             
+            if response_WAL == False:
+                return {
+                    "success": False,
+                    "error": "Error from walmartAPI"
+                }
+            
             totalCount = response_WAL['totalResults']
             
             for i in range(len(response_WAL['items'])):   

@@ -32,10 +32,12 @@ def generateWalmartHeaders():
             "WM_SEC.AUTH_SIGNATURE": signature_enc,
             "WM_CONSUMER.INTIMESTAMP": hashList["WM_CONSUMER.INTIMESTAMP"],
             "WM_CONSUMER.ID": hashList["WM_CONSUMER.ID"],
-            "WM_SEC.KEY_VERSION": hashList["WM_SEC.KEY_VERSION"],
+            "WM_SEC.KEY_VERSION": hashList["WM_SEC.KEY_VERSION"]
         }
+        
     except Exception as e:
-        logger.critical(f"{e}")
+        logger.critical(f"{e}", exc_info=True)
+        return False
 
 
 async def walmartAPI(url):
@@ -49,4 +51,4 @@ async def walmartAPI(url):
             return response.json()
         
     except Exception as e:
-       logger.critical(f"{e} - {traceback.format_exc}")
+       logger.critical(f"{e}", exc_info=True)
