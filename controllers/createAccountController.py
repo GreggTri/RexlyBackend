@@ -51,6 +51,7 @@ async def createAccountController(req, res, user):
     newUser = req.app.db['users'].find_one({'email':newUser.get('email')})
     if response.acknowledged == True:
         req.app.twilio.messages.create(
+                messaging_service_sid=os.getenv('TWILIO_MG_ID'),
                 to=user.phoneNumber, 
                 from_=os.getenv('TWILIO_NUMBER'),
                 body="your account has been created. Rexly is now at your service! if you would like to stop using rexly, please send us an email at support@rexly.co"

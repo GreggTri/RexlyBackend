@@ -12,6 +12,7 @@ load_dotenv()
 
 logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
+
 def generateWalmartHeaders():
 
     hashList = {
@@ -26,9 +27,11 @@ def generateWalmartHeaders():
         
         logger.info(os.getenv('RSA_PRIVATE_KEY'))
         
-        privateKey = RSA.import_key(os.getenv('RSA_PRIVATE_KEY'))
-        signer = pkcs1_15.new(privateKey)
         
+        privateKey = RSA.importKey(os.getenv('RSA_PRIVATE_KEY'))
+        
+        signer = pkcs1_15.new(privateKey)
+
         signature = signer.sign(hash_obj)
         signature_enc = base64.b64encode(signature).decode()
         
@@ -41,7 +44,7 @@ def generateWalmartHeaders():
         }
         
     except Exception as e:
-        logger.critical(f"{e} {privateKey}, {os.getenv('RSA_PRIVATE_KEY')}", exc_info=True)
+        logger.critical(f"{e}", exc_info=True)
         return False
 
 
