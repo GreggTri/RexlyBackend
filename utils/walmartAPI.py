@@ -28,7 +28,7 @@ def generateWalmartHeaders():
         signature = signer.sign(hash_obj)
         signature_enc = base64.b64encode(signature).decode()
         
-        logger.info(privateKey)
+        #logger.info(privateKey)
         logger.info(os.getenv('RSA_PRIVATE_KEY'))
         return {
             "WM_SEC.AUTH_SIGNATURE": signature_enc,
