@@ -4,6 +4,7 @@ from fastapi import Request
 import os
 import datetime
 from dotenv import load_dotenv
+load_dotenv()
 
 def retrieveShortURL(req: Request, user_id, long_url):
     #url_received = request.form["nm"]

@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from twilio.rest import Client
 from amplitude import *
 import logging
+load_dotenv()
 
 # Your Account SID from twilio.com/console
 account_sid = os.getenv('TWILIO_ACCOUNT_TOKEN')
@@ -18,7 +19,7 @@ logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)  # the __name__ resolve to "main" since we are at the root of the project. 
 # This will get the root logger since no logger in the configuration has this name.
 
-load_dotenv()
+
 from routers import users, chat
 app = FastAPI()
 

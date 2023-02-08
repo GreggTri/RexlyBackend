@@ -3,6 +3,8 @@ import traceback
 import os
 from .walmartAPI import walmartAPI
 import ast
+from dotenv import load_dotenv
+load_dotenv()
 
 logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)

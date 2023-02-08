@@ -7,6 +7,8 @@ from Crypto.PublicKey import RSA
 import base64
 import httpx
 import datetime
+from dotenv import load_dotenv
+load_dotenv()
 
 logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
@@ -22,14 +24,15 @@ def generateWalmartHeaders():
         sortedHashString = f"{hashList['WM_CONSUMER.ID']}\n{hashList['WM_CONSUMER.INTIMESTAMP']}\n{hashList['WM_SEC.KEY_VERSION']}\n"
         hash_obj = SHA256.new(sortedHashString.encode())
         
+        logger.info(os.getenv('RSA_PRIVATE_KEY'))
+        
         privateKey = RSA.import_key(os.getenv('RSA_PRIVATE_KEY'))
         signer = pkcs1_15.new(privateKey)
         
         signature = signer.sign(hash_obj)
         signature_enc = base64.b64encode(signature).decode()
         
-        #logger.info(privateKey)
-        logger.info(os.getenv('RSA_PRIVATE_KEY'))
+        
         return {
             "WM_SEC.AUTH_SIGNATURE": signature_enc,
             "WM_CONSUMER.INTIMESTAMP": hashList["WM_CONSUMER.INTIMESTAMP"],
