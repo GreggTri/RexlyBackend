@@ -12,7 +12,6 @@ load_dotenv()
 
 logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
-
 def generateWalmartHeaders():
 
     hashList = {
@@ -25,13 +24,11 @@ def generateWalmartHeaders():
         sortedHashString = f"{hashList['WM_CONSUMER.ID']}\n{hashList['WM_CONSUMER.INTIMESTAMP']}\n{hashList['WM_SEC.KEY_VERSION']}\n"
         hash_obj = SHA256.new(sortedHashString.encode())
         
-        logger.info(os.getenv('RSA_PRIVATE_KEY'))
-        
-        
-        privateKey = RSA.importKey(os.getenv('RSA_PRIVATE_KEY'))
+        with open(f"./walmartKey.pem", mode='rb') as f:
+            privateKey = RSA.importKey(f.read())
+            f.close()
         
         signer = pkcs1_15.new(privateKey)
-
         signature = signer.sign(hash_obj)
         signature_enc = base64.b64encode(signature).decode()
         
