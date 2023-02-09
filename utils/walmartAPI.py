@@ -24,9 +24,14 @@ def generateWalmartHeaders():
         sortedHashString = f"{hashList['WM_CONSUMER.ID']}\n{hashList['WM_CONSUMER.INTIMESTAMP']}\n{hashList['WM_SEC.KEY_VERSION']}\n"
         hash_obj = SHA256.new(sortedHashString.encode())
         
-        with open(f"./walmartKey.pem", mode='rb') as f:
-            privateKey = RSA.importKey(f.read())
-            f.close()
+        if os.getenv('PY_ENV') == 'prod':
+            with open(f"/opt/current/app/walmartKey.pem", mode='rb') as f:
+                privateKey = RSA.importKey(f.read())
+                f.close()
+        else:
+            with open(f"./walmartKey.pem", mode='rb') as f:
+                privateKey = RSA.importKey(f.read())
+                f.close()
         
         signer = pkcs1_15.new(privateKey)
         signature = signer.sign(hash_obj)
