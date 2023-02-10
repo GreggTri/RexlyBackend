@@ -24,7 +24,7 @@ def generateWalmartHeaders():
         sortedHashString = f"{hashList['WM_CONSUMER.ID']}\n{hashList['WM_CONSUMER.INTIMESTAMP']}\n{hashList['WM_SEC.KEY_VERSION']}\n"
         hash_obj = SHA256.new(sortedHashString.encode())
         
-        with open(f"./walmartKey.pem", mode='rb') as f:
+        with open("./walmartKey.pem", mode='rb') as f:
             privateKey = RSA.importKey(f.read())
             f.close()
         
