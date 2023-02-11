@@ -48,15 +48,13 @@ async def chatController(req: Request, res: Response, From: str = Form(...), Bod
                 response.message("Sorry, I couldn't find any products that fit your search")
             else:
                 #this is to build the entire response for the user
-                message.body(f"{botResponse.get('intentResult')}\n")
+                botMessage = f"{botResponse.get('intentResult')}\n"
                 
                 for index, product in enumerate(botResponse.get('search', {})):
-                    message.body(f"{index + 1}: {product.get('name')}\n${product.get('salePrice')}\n")
-                    #lets not do this for now to save money and see how it goes. this is for sending pictures
-                    #message.media(product.get('mediumImage'))
-                    message.body(f"{retrieveShortURL(req, userExists['_id'], product.get('productTrackingUrl'))}\n")
+                    botMessage += f"{index + 1}: {product.get('name')}\n${product.get('salePrice')}\n{retrieveShortURL(req, userExists['_id'], product.get('productTrackingUrl'))}\n"
                 
                 #we then put the entire response into the messaginsResponse object
+                message.body(botMessage)
                 response.append(message)  
         #elif "nbp" in botResponse:
         #    response.message(f"")
@@ -64,6 +62,7 @@ async def chatController(req: Request, res: Response, From: str = Form(...), Bod
             response.message(f"{botResponse.get('intentResult')}")
         
         #creates doc to send to DB
+        logger.info(botResponse.get('probRes'))
         msgDoc = {
             "user_id": userExists['_id'],
             "user_msg": Body,
