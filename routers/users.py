@@ -8,9 +8,7 @@ router = APIRouter()
 
 class newUser(BaseModel):
     email: str
-    phoneNumber: str
     password: str
-    fromPhoneLink: bool
 
 class user(BaseModel):
     _id: str
