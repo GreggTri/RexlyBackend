@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 
 from controllers.createAccountController import createAccountController
+from controllers.viewAccountController import viewAccountController
 from controllers.deleteAccountController import deleteAccountController
 router = APIRouter()
 
@@ -19,7 +20,11 @@ class user(BaseModel):
 async def createUserAccount(req: Request, res: Response, user: newUser):
     return await createAccountController(req, res, user)
 
-@router.post("/deleteAccount", response_description="deletes a user", status_code=status.HTTP_201_CREATED)
+@router.post("/viewAccount", response_description="View an account", status_code=status.HTTP_200_OK)
+async def viewUserAccount(req: Request, res: Response, user: user):
+    return await viewAccountController(req, res, user)
+
+@router.post("/deleteAccount", response_description="deletes a user", status_code=status.HTTP_200_OK)
 async def deleteUserAccount(req: Request, res: Response, user: user):
     return await deleteAccountController(req, res, user)
         

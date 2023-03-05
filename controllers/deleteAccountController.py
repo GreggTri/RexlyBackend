@@ -1,9 +1,8 @@
 from fastapi import status
 import traceback
-import os
-import datetime
 from amplitude import *
 import logging
+
 logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 
@@ -28,6 +27,7 @@ async def deleteAccountController(req, res, user):
     
     else:
         res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        logger.error(f"Something went wrong when trying to delete user:\n{traceback.format_exc()}")
         return "Sorry, something went wrong. Please try again."
     
     

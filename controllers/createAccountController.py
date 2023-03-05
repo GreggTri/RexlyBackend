@@ -1,7 +1,6 @@
 from fastapi import status
 from fastapi.encoders import jsonable_encoder
 import traceback
-import os
 import bcrypt
 import datetime
 from amplitude import *
