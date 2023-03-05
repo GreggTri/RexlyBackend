@@ -6,7 +6,8 @@ import bcrypt
 import datetime
 from amplitude import *
 import logging
-logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
+
+logging.config.fileConfig('logging.conf', disable_existing_loggers=True)
 logger = logging.getLogger(__name__)
 
 async def createAccountController(req, res, user):
@@ -64,7 +65,7 @@ async def createAccountController(req, res, user):
                 'fromPhoneLink': fromPhoneLink
             }
         ))
-        
+         
         req.app.amplitude.shutdown()
         logger.info("User Created Successfully")
         return "Your account has been created! Check your phone!"
