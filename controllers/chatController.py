@@ -14,60 +14,46 @@ logger = logging.getLogger(__name__)
 
 # req holds all the twilio info being sent, find out more here:
 # https://www.twilio.com/docs/messaging/guides/webhook-request#parameters-in-twilios-request-to-your-application
-async def chatController(req: Request, res: Response, From: str = Form(...), Body: str = Form(...)):
+async def chatController(req: Request, res: Response, chatMsg):
     #check if user has an account if not send create account link
-    response = MessagingResponse()
-    message = Message()
     
     try:
-        userNumber = From
 
-        if Body is None or userNumber is None:
+        if chatMsg._id is None or chatMsg.message is None:
             res.status_code = status.HTTP_404_NOT_FOUND
             return "[404 Error]: Request data not found"
-       
-        userExists = req.app.db['users'].find_one({"phoneNumber":userNumber}, {'_id'})
-        if not userExists:
-            link = createLink(userNumber)
-            response.message(f"Hey! It seems you don't have an account yet. In order to use our service, you must have an account. Here's a link to sign up! {link}")
-            return str(response)
         
         #sends msg to Rexly
-        botResponse = await rexlyBot(Body)
+        botResponse = await rexlyBot(chatMsg.message)
         
         #this is to check if we got an error from walmart search
         if botResponse.get('search') == False:
             res.status_code = status.HTTP_200_OK
-            response.message("Sorry friend, I ran into an error when looking for this product. If this issue persists please contact us at support@rexly.co")
-            return str(response)
+            botMessage = "Sorry friend, I ran into an error when looking for this product. If this issue persists please contact us at support@rexly.co"
+            return botMessage
         
         #formatts response for text
         if "search" in botResponse:
             
             if len(botResponse.get('search')) == 0:
-                response.message("Sorry, I couldn't find any products that fit your search")
+                botMessage = "Sorry, I couldn't find any products that fit your search"
             else:
                 #this is to build the entire response for the user
                 botMessage = f"{botResponse.get('intentResult')}\n"
                 
                 for index, product in enumerate(botResponse.get('search', {})):
-                    botMessage += f"{index + 1}: {product.get('name')}\n${product.get('salePrice')}\n{retrieveShortURL(req, userExists['_id'], product.get('productTrackingUrl'))}\n"
-                
-                #we then put the entire response into the messaginsResponse object
-                message.body(botMessage)
-                response.append(message)  
+                    botMessage += f"{index + 1}: {product.get('name')}\n${product.get('salePrice')}\n{retrieveShortURL(req, chatMsg._id, product.get('productTrackingUrl'))}\n" 
         #elif "nbp" in botResponse:
         #    response.message(f"")
         else:
-            response.message(f"{botResponse.get('intentResult')}")
+            botMessage = str(botResponse.get('intentResult'))
         
         #creates doc to send to DB
-        logger.info(botResponse.get('probRes'))
         msgDoc = {
-            "user_id": userExists['_id'],
-            "user_msg": Body,
+            "user_id": chatMsg._id,
+            "user_msg": chatMsg.message,
             "tag": botResponse.get('tag'),
-            "bot_response": botResponse.get('intentResult'),
+            "bot_response": botMessage,
             "probability_response": botResponse.get('probRes'),
             'created_At': datetime.datetime.utcnow()
         }
@@ -79,20 +65,20 @@ async def chatController(req: Request, res: Response, From: str = Form(...), Bod
             
             req.app.amplitude.track(BaseEvent(
                 event_type='User Message',
-                user_id=str(userExists.get('_id')),
+                user_id=str(chatMsg._id),
                 event_properties={
                     'botIntent': botResponse.get('tag'),
                 }
             ))
             req.app.amplitude.shutdown()
-            return str(response)
+            return botMessage
 
         logger.error("Message did not get saved in the database and it was not tracked by amp")
-        res.status_code = status.HTTP_200_OK #we must return 200 regardless or message won't be sent
-        return str(response)
+        res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR #we must return 200 regardless or message won't be sent
+        return botMessage
     
     except Exception as e:
         logger.critical(f"\n[Error]: {e}, {traceback.format_exc()}")
-        res.status_code = status.HTTP_200_OK #we must return 200 regardless or message won't be sent
-        response.message(f"Sorry friend, I ran into an error. Please try again. If this issue persists please contact us at support@rexly.co")
-        return str(response)
+        res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR#we must return 200 regardless or message won't be sent
+        botMessage = f"Sorry friend, I ran into an error. Please try again. If this issue persists please contact us at support@rexly.co"
+        return botMessage
