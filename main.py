@@ -26,12 +26,15 @@ app = FastAPI()
 try:
     app.mongodb_client = MongoClient(host=os.getenv('MONGO_URL'))
     app.db = app.mongodb_client[os.getenv('DB_NAME')]
+    
+    app.db['users'].create_index("email", unique=True, background=True)
+    
     app.twilio = Client(account_sid, auth_token)
     app.amplitude = Amplitude(os.getenv('AMP_API_KEY'))
-    print("connected to database!")
+    logger.info("connected to database!")
 
 except Exception as e:
-    print("Error: ", e)
+    logger.critical("Error: ", e)
     
 origins = [
     os.getenv('CREATE_ACCOUNT_URL'),

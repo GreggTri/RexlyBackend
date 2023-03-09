@@ -5,6 +5,8 @@ import traceback
 from amplitude import *
 import logging
 
+from utils.jwtHandler import signJWT
+
 logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 
@@ -32,7 +34,7 @@ async def signInController(req, res, user):
                 logger.info(f"user {foundUser['email']} has been autheticated")
                 return JSONResponse(content={
                 "success": True,
-                "user": foundUser        
+                "token": signJWT(user.email)        
                 }, status_code=200 )
             else:
                 return JSONResponse(content={
