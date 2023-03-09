@@ -1,4 +1,6 @@
 from fastapi import status
+from fastapi.responses import JSONResponse
+from bson import ObjectId
 import traceback
 from amplitude import *
 import logging
@@ -7,24 +9,34 @@ logger = logging.getLogger(__name__)
 
 async def viewAccountController(req, res, user):
     
-    if(user._id is None or user.email is None):
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return "Bad Request"
+    if(user.user_id is None):
+        return JSONResponse(content={
+                "success": False,
+                "message": "Bad Request"        
+            }, status_code=400)
     
     try:
-        foundUser = req.app.db['users'].find_one({'_id': user['_id']})
+        user_id_str = str(user.user_id)
+        foundUser = req.app.db['users'].find_one({"_id": ObjectId(user_id_str)}, {"_id": 1, "email": 1})
         
         if foundUser is not None:
+            foundUser['_id'] = str(foundUser['_id']) #so it is serialiable by JSON
             
-            logger.info(f"User: {user['_id']} has been found")
-            res.status_code = status.HTTP_200_OK
-            return foundUser
+            logger.info(f"User: {user.user_id} has been found")
+            return JSONResponse(content={
+                "success": True,
+                "user": foundUser        
+            }, status_code=200 )
         else:
-            logger.error(f"User: {user['_id']} does not exist")
-            res.status_code = status.HTTP_404_NOT_FOUND
-            return "User could not be found."
-        
+            logger.error(f"User: {user.user_id} does not exist")
+            return JSONResponse(content={
+                "success": False,
+                "message": "User not found"        
+            }, status_code=404)
+            
     except Exception as e:
         logger.error(f"Something went wrong when trying to view a user:\n{traceback.format_exc()}")
-        res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return "Sorry, something went wrong. Please try again."
+        return JSONResponse(content={
+                "success": False,
+                "message": "Sorry, something went wrong. Please try again."        
+            }, status_code=500)

@@ -1,4 +1,6 @@
 from fastapi import status
+from fastapi.responses import JSONResponse
+from bson import ObjectId
 import traceback
 from amplitude import *
 import logging
@@ -8,26 +10,40 @@ logger = logging.getLogger(__name__)
 
 async def deleteAccountController(req, res, user):
     
-    if(user._id is None or user.email is None):
-        res.status_code = status.HTTP_400_BAD_REQUEST
-        return "Bad Request"
+    if(user.user_id is None):
+        return JSONResponse(content={
+                "success": False,
+                "message": "Sorry, something went wrong. Please try again."        
+        }, status_code=400)
     
-    deletedUser = req.app.db['users'].delete_one({'_id':user.get('_id')})
+    try:
+        deletedUser = req.app.db['users'].delete_one({'_id': ObjectId(user.user_id)})
+        
+        if deletedUser.acknowledged == True:
+            req.app.amplitude.track(BaseEvent(
+                event_type='User Deleted',
+                user_id=user.user_id
+            ))
+            
+            req.app.amplitude.shutdown()
+            logger.info(f"User: {user.user_id} has been deleted successfully")
+            return JSONResponse(content={
+                    "success": True,
+                    "message": "Your account has successfully been deleted"        
+            }, status_code=200)
+        
+        else:
+            logger.error(f"Something went wrong when trying to delete user:\n{traceback.format_exc()}")
+            return JSONResponse(content={
+                    "success": False,
+                    "message": "Sorry, something went wrong. Please try again."        
+            }, status_code=500)
     
-    if deletedUser.acknowledged == True:
-        req.app.amplitude.track(BaseEvent(
-            event_type='User Deleted',
-            user_id=str(user['_id'])
-        ))
-         
-        req.app.amplitude.shutdown()
-        logger.info(f"User: {user['_id']} has been deleted successfully")
-        res.status_code = status.HTTP_200_OK
-        return "Your account has successfully been deleted"
-    
-    else:
-        res.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        logger.error(f"Something went wrong when trying to delete user:\n{traceback.format_exc()}")
-        return "Sorry, something went wrong. Please try again."
+    except:
+        logger.critical(f"Exception caught: :\n{traceback.format_exc()}")
+        return JSONResponse(content={
+                "success": False,
+                "message": "Sorry, something went wrong. Please try again."        
+        }, status_code=500)
     
     

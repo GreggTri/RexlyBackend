@@ -6,7 +6,7 @@ from controllers.chatController import chatController
 router = APIRouter()
 
 class chatMsg(BaseModel):
-    _id: str
+    user_id: str
     message: str
 
 #We make the response class HTMLResponse because it is something that Twilio can understand.

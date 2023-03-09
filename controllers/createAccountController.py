@@ -16,6 +16,9 @@ async def createAccountController(req, res, user):
         res.status_code = status.HTTP_400_BAD_REQUEST
         return "[400 Error]: Bad Request"
     
+    #We want to lowercase the email
+    user.email = user.email.lower()
+    
     checkUser = req.app.db['users'].find_one({"email": user.email})
     if checkUser != None:
         res.status_code = status.HTTP_400_BAD_REQUEST
@@ -27,8 +30,7 @@ async def createAccountController(req, res, user):
     hashed = bcrypt.hashpw(user.password, salt)
     user.password = hashed
     
-    #We want to lowercase the email
-    user.email = user.email.lower()
+    
     
     newUser = {
         'email': user.email,
@@ -38,8 +40,7 @@ async def createAccountController(req, res, user):
     newUser = jsonable_encoder(newUser)
     
     #send user to the database
-    response = req.app.db['users'].insert_one(newUser)        
-    newUser = req.app.db['users'].find_one({'email':newUser.get('email')})
+    response = req.app.db['users'].insert_one(newUser)
     if response.acknowledged == True:
         
         req.app.amplitude.track(BaseEvent(
