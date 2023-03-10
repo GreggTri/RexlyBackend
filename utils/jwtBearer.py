@@ -18,12 +18,17 @@ class jwtBearer(HTTPBearer):
             if not credentials.scheme == "Bearer":
                 raise HTTPException(status_code=403, detail="Invalid or Expired token")
             
-            isTokenValid = self.verify_jwt(credentials.credentials)
+            isTokenValid, jwtPayload = self.verify_jwt(credentials.credentials)
             
             if isTokenValid == False:
                 raise HTTPException(status_code=403, detail="Invalid or Expired token")
             
-            return credentials.credentials
+            foundUser = req.app.db['users'].find_one({"email": jwtPayload['user_email']}, {"_id": 1})
+            
+            if foundUser:
+                return credentials.credentials
+            else:
+                raise HTTPException(status_code=403, detail="Invalid or Expired token")
         else:
             raise HTTPException(status_code=403, detail="Invalid or Expired token")
     
@@ -33,6 +38,6 @@ class jwtBearer(HTTPBearer):
         
         if payload:
             isTokenValid = True
-        return isTokenValid
+        return isTokenValid, payload
         
         

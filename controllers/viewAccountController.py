@@ -1,6 +1,5 @@
 from fastapi import status
 from fastapi.responses import JSONResponse
-from bson import ObjectId
 import traceback
 from amplitude import *
 import logging
@@ -9,20 +8,18 @@ logger = logging.getLogger(__name__)
 
 async def viewAccountController(req, res, user):
     
-    if(user.user_id is None):
+    if(user.email is None):
         return JSONResponse(content={
                 "success": False,
                 "message": "Bad Request"        
             }, status_code=400)
     
     try:
-        user_id_str = str(user.user_id)
-        foundUser = req.app.db['users'].find_one({"_id": ObjectId(user_id_str)}, {"_id": 1, "email": 1})
+        foundUser = req.app.db['users'].find_one({"email": user.email}, {"email": 1})
         
         if foundUser is not None:
             foundUser['_id'] = str(foundUser['_id']) #so it is serialiable by JSON
             
-            logger.info(f"User: {user.user_id} has been found")
             return JSONResponse(content={
                 "success": True,
                 "user": foundUser        

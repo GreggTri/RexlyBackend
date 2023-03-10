@@ -10,23 +10,23 @@ logger = logging.getLogger(__name__)
 
 async def deleteAccountController(req, res, user):
     
-    if(user.user_id is None):
+    if(user.email is None):
         return JSONResponse(content={
                 "success": False,
                 "message": "Sorry, something went wrong. Please try again."        
         }, status_code=400)
     
     try:
-        deletedUser = req.app.db['users'].delete_one({'_id': ObjectId(user.user_id)})
+        deletedUser = req.app.db['users'].delete_one({'email': user.email})
         
         if deletedUser.acknowledged == True:
             req.app.amplitude.track(BaseEvent(
                 event_type='User Deleted',
-                user_id=user.user_id
+                user_id=user.email
             ))
             
             req.app.amplitude.shutdown()
-            logger.info(f"User: {user.user_id} has been deleted successfully")
+            logger.info(f"User: {user.email} has been deleted successfully")
             return JSONResponse(content={
                     "success": True,
                     "message": "Your account has successfully been deleted"        

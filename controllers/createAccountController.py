@@ -36,8 +36,6 @@ async def createAccountController(req, res, user):
     hashed = bcrypt.hashpw(user.password, salt)
     user.password = hashed
     
-    
-    
     newUser = {
         'email': user.email,
         'password': user.password,
@@ -51,10 +49,7 @@ async def createAccountController(req, res, user):
         
         req.app.amplitude.track(BaseEvent(
             event_type='User SignUp',
-            user_id=str(newUser['_id']),
-            user_properties={
-                'email': newUser['email']
-            }
+            user_id=str(newUser['email'])
         ))
         req.app.amplitude.shutdown()
         

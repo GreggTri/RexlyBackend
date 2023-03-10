@@ -18,7 +18,7 @@ class UserSignIn(BaseModel):
     email: EmailStr = Field(default=None)
     password: str = Field(default=None)
 class user(BaseModel):
-    user_id: str
+    email: EmailStr = Field(default=None)
 
 
 #creates the users account and should also sent a text to user tellin them that they'r eaccount has been created.
