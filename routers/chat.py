@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Response, Form,  Request, status, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
 
 from controllers.chatController import chatController
 from utils.jwtBearer import jwtBearer
 router = APIRouter()
 
 class chatMsg(BaseModel):
-    user_id: str
+    email:EmailStr = Field(default=None)
     message: str
 
 #We make the response class HTMLResponse because it is something that Twilio can understand.

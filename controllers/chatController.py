@@ -16,7 +16,7 @@ async def chatController(req: Request, res: Response, chatMsg):
     #check if user has an account if not send create account link
     try:
 
-        if chatMsg.user_id is None or chatMsg.message is None:
+        if chatMsg.email is None or chatMsg.message is None:
              return JSONResponse(content={
                 "success": False,
                 "message": "Bad Request"      
@@ -42,10 +42,11 @@ async def chatController(req: Request, res: Response, chatMsg):
         else:
             botMessage = str(botResponse.get('intentResult'))
         
+        user = req.app.db['users'].find_one({"email": chatMsg.email}, {"_id": 1})
         #creates doc to send to DB, if products were searched for saves those products else does not
         if botResponse.get('search', {}) is not None:
             msgDoc = {
-                "user_id": chatMsg.user_id,
+                "user_id": user['_id'],
                 "user_msg": chatMsg.message,
                 "tag": botResponse.get('tag'),
                 "bot_response": botMessage,
@@ -55,7 +56,7 @@ async def chatController(req: Request, res: Response, chatMsg):
             }
         else:
             msgDoc = {
-                "user_id": chatMsg.user_id,
+                "user_id": user['_id'],
                 "user_msg": chatMsg.message,
                 "tag": botResponse.get('tag'),
                 "bot_response": botMessage,
@@ -70,7 +71,7 @@ async def chatController(req: Request, res: Response, chatMsg):
             
             req.app.amplitude.track(BaseEvent(
                 event_type='User Message',
-                user_id=str(chatMsg.user_id),
+                user_id=str(chatMsg.email),
                 event_properties={
                     'botIntent': botResponse.get('tag'),
                 }
