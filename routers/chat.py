@@ -6,7 +6,6 @@ from utils.jwtBearer import jwtBearer
 router = APIRouter()
 
 class chatMsg(BaseModel):
-    email:EmailStr = Field(default=None)
     message: str
 
 #We make the response class HTMLResponse because it is something that Twilio can understand.

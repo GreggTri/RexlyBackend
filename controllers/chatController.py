@@ -1,10 +1,11 @@
 from fastapi import status, Request, Response
 from fastapi.responses import JSONResponse
 import traceback
-from twilio.twiml.messaging_response import MessagingResponse, Message
 from amplitude import *
 import datetime
+
 from AI.botRunner import rexlyBot
+from utils.jwtHandler import decodeJWT
 import logging
 
 logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
@@ -16,7 +17,12 @@ async def chatController(req: Request, res: Response, chatMsg):
     #check if user has an account if not send create account link
     try:
 
-        if chatMsg.email is None or chatMsg.message is None:
+        auth_header = req.headers.get("Authorization")
+        token = auth_header.split(" ")[1]
+        decoded_token = decodeJWT(token)
+        user_email = decoded_token["user_email"]
+        
+        if user_email is None or chatMsg.message is None:
              return JSONResponse(content={
                 "success": False,
                 "message": "Bad Request"      
@@ -42,7 +48,7 @@ async def chatController(req: Request, res: Response, chatMsg):
         else:
             botMessage = str(botResponse.get('intentResult'))
         
-        user = req.app.db['users'].find_one({"email": chatMsg.email}, {"_id": 1})
+        user = req.app.db['users'].find_one({"email": user_email}, {"_id": 1})
         #creates doc to send to DB, if products were searched for saves those products else does not
         if botResponse.get('search', {}) is not None:
             msgDoc = {
@@ -71,7 +77,7 @@ async def chatController(req: Request, res: Response, chatMsg):
             
             req.app.amplitude.track(BaseEvent(
                 event_type='User Message',
-                user_id=str(chatMsg.email),
+                user_id=str(user_email),
                 event_properties={
                     'botIntent': botResponse.get('tag'),
                 }
