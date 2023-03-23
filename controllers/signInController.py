@@ -34,7 +34,7 @@ async def signInController(req, res, user):
                 logger.info(f"user {foundUser['email']} has been autheticated")
                 return JSONResponse(content={
                 "success": True,
-                "token": signJWT(user.email)        
+                "token": signJWT(foundUser['_id'])        
                 }, status_code=200 )
             else:
                 return JSONResponse(content={

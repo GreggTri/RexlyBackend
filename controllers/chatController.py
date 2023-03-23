@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 import traceback
 from amplitude import *
 import datetime
-
+from bson import ObjectId
 from AI.botRunner import rexlyBot
 from utils.jwtHandler import decodeJWT
 import logging
@@ -20,9 +20,9 @@ async def chatController(req: Request, res: Response, chatMsg):
         auth_header = req.headers.get("Authorization")
         token = auth_header.split(" ")[1]
         decoded_token = decodeJWT(token)
-        user_email = decoded_token["user_email"]
+        user_id = decoded_token["user_id"]
         
-        if user_email is None or chatMsg.message is None:
+        if user_id is None or chatMsg.message is None:
              return JSONResponse(content={
                 "success": False,
                 "message": "Bad Request"      
@@ -47,12 +47,11 @@ async def chatController(req: Request, res: Response, chatMsg):
                 botMessage = f"{botResponse.get('intentResult')}"
         else:
             botMessage = str(botResponse.get('intentResult'))
-        
-        user = req.app.db['users'].find_one({"email": user_email}, {"_id": 1})
+
         #creates doc to send to DB, if products were searched for saves those products else does not
         if botResponse.get('search', {}) is not None:
             msgDoc = {
-                "user_id": user['_id'],
+                "user_id": ObjectId(user_id),
                 "user_msg": chatMsg.message,
                 "tag": botResponse.get('tag'),
                 "bot_response": botMessage,
@@ -60,9 +59,10 @@ async def chatController(req: Request, res: Response, chatMsg):
                 "probability_response": botResponse.get('probRes'),
                 'created_At': datetime.datetime.utcnow()
             }
+            
         else:
             msgDoc = {
-                "user_id": user['_id'],
+                "user_id": ObjectId(user_id),
                 "user_msg": chatMsg.message,
                 "tag": botResponse.get('tag'),
                 "bot_response": botMessage,
@@ -77,7 +77,7 @@ async def chatController(req: Request, res: Response, chatMsg):
             
             req.app.amplitude.track(BaseEvent(
                 event_type='User Message',
-                user_id=str(user_email),
+                user_id=str(user_id),
                 event_properties={
                     'botIntent': botResponse.get('tag'),
                 }

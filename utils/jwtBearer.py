@@ -1,7 +1,7 @@
 import logging
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-
+from bson import ObjectId
 from .jwtHandler import decodeJWT
 
 logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
@@ -23,7 +23,7 @@ class jwtBearer(HTTPBearer):
             if isTokenValid == False:
                 raise HTTPException(status_code=403, detail="Invalid or Expired token")
             
-            foundUser = req.app.db['users'].find_one({"email": jwtPayload['user_email']}, {"_id": 1})
+            foundUser = req.app.db['users'].find_one({"_id": ObjectId(jwtPayload['user_id'])}, {"_id": 1})
             
             if foundUser:
                 return credentials.credentials

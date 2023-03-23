@@ -47,16 +47,17 @@ async def createAccountController(req, res, user):
     response = req.app.db['users'].insert_one(newUser)
     if response.acknowledged == True:
         
+        createdUser = req.app.db['users'].find_one({"email": user.email}, {"_id": 1})
+        
         req.app.amplitude.track(BaseEvent(
             event_type='User SignUp',
-            user_id=str(newUser['email'])
+            user_id=str(createdUser.get("_id"))
         ))
         req.app.amplitude.shutdown()
         
-        logger.info("User Created Successfully")
         return JSONResponse(content={
                 "success": True,
-                "token": signJWT(user.email), 
+                "token": signJWT(createdUser.get("_id")), 
         }, status_code=201 )
     
     #if user isn't saved to the database then we go here and return error to where user came from.
